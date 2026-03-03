@@ -69,29 +69,29 @@ def plot_histogram(image_rgb, title):
 # --- 2. WEB APP UI SETTINGS ---
 st.set_page_config(page_title="Chaos Crypto Pro", page_icon="🔐", layout="wide")
 
-st.title("🔐 Chaos-Based Image Cryptography")
+st.title(" Chaos-Based Image Cryptography")
 st.markdown("Secure your private images using non-linear dynamical systems.")
 st.markdown("---")
 
 # --- 3. SIDEBAR (KEYS) ---
-st.sidebar.header("Security Keys ⚙️")
+st.sidebar.header("Security Keys ")
 st.sidebar.info("Keep keys safe for encryption & decryption!")
 arnold_iterations = st.sidebar.slider("Arnold Map Iterations", 1, 10, 5)
 logistic_x0 = st.sidebar.number_input("Secret Key 1 (x0)", value=0.54321, format="%.5f")
 logistic_r = st.sidebar.number_input("Secret Key 2 (r)", value=3.99, format="%.2f")
 
 # --- 4. TABS SETUP ---
-tab_encrypt, tab_decrypt, tab_analysis = st.tabs(["🔒 Encrypt Image", "🔓 Decrypt Image", "📊 Security Dashboard"])
+tab_encrypt, tab_decrypt, tab_analysis = st.tabs([" Encrypt Image", " Decrypt Image", "📊 Security Dashboard"])
 
 # ==========================================
 #               ENCRYPTION TAB
 # ==========================================
 with tab_encrypt:
     st.header("Step 1: Hide Your Image")
-    input_method = st.radio("Choose Input:", ("💻 Upload from PC", "📸 Take Live Photo"))
+    input_method = st.radio("Choose Input:", (" Upload from PC", " Take Live Photo"))
     
     enc_file = None
-    if input_method == "💻 Upload from PC":
+    if input_method == " Upload from PC":
         enc_file = st.file_uploader("Upload an Image to Encrypt", type=["jpg", "png", "jpeg"], key="enc_up")
     else:
         enc_file = st.camera_input("Take a picture to encrypt", key="enc_cam")
@@ -106,7 +106,7 @@ with tab_encrypt:
         with col1:
             st.image(original_image, caption=f"Original Size: {orig_w}x{orig_h}", use_container_width=True)
             
-        if st.button("🚀 Encrypt Now", key="btn_enc"):
+        if st.button(" Encrypt Now", key="btn_enc"):
             with st.spinner('Encrypting...'):
                 N = max(orig_h, orig_w) 
                 padded_image = np.zeros((N, N, 3), dtype=np.uint8)
@@ -123,7 +123,7 @@ with tab_encrypt:
                     st.image(final_encrypted_img, caption="Encrypted (White Noise)", use_container_width=True)
                     is_success, buffer = cv2.imencode(".png", cv2.cvtColor(final_encrypted_img, cv2.COLOR_RGB2BGR))
                     if is_success:
-                        st.download_button("📥 Download Encrypted Image", buffer.tobytes(), "encrypted.png", "image/png")
+                        st.download_button(" Download Encrypted Image", buffer.tobytes(), "encrypted.png", "image/png")
 
 # ==========================================
 #               DECRYPTION TAB
@@ -143,7 +143,7 @@ with tab_decrypt:
         col3, col4 = st.columns(2)
         with col3: st.image(encrypted_image, caption="Encrypted Input", use_container_width=True)
             
-        if st.button("🔓 Decrypt Now", key="btn_dec"):
+        if st.button(" Decrypt Now", key="btn_dec"):
             with st.spinner('Matching Secret Keys...'):
                 r_enc, g_enc, b_enc = cv2.split(encrypted_image)
                 r_final = inverse_arnold_cat_map(diffusion_xor(r_enc, logistic_x0, logistic_r), arnold_iterations)
@@ -156,13 +156,13 @@ with tab_decrypt:
                     st.image(final_restored_img, caption="Restored Image", use_container_width=True)
                     is_success, buffer = cv2.imencode(".jpg", cv2.cvtColor(final_restored_img, cv2.COLOR_RGB2BGR))
                     if is_success:
-                        st.download_button("📥 Download Restored", buffer.tobytes(), "restored.jpg", "image/jpeg")
+                        st.download_button(" Download Restored", buffer.tobytes(), "restored.jpg", "image/jpeg")
 
 # ==========================================
 #           SECURITY DASHBOARD TAB
 # ==========================================
 with tab_analysis:
-    st.header("📊 Threat Analysis & Avalanche Effect")
+    st.header(" Threat Analysis & Avalanche Effect")
     st.markdown("Upload a small test image to instantly generate a full security audit report.")
     
     test_file = st.file_uploader("Upload Image for Security Test", type=["jpg", "png"], key="test_up")
@@ -173,7 +173,7 @@ with tab_analysis:
         # Resize small for fast analysis
         small_img = cv2.resize(cv2.cvtColor(opencv_image, cv2.COLOR_BGR2RGB), (256, 256))
         
-        if st.button("🔍 Run Full Security Audit"):
+        if st.button(" Run Full Security Audit"):
             with st.spinner('Generating cryptographic proofs...'):
                 # 1. Encrypt
                 r, g, b = cv2.split(small_img)
@@ -214,4 +214,4 @@ with tab_analysis:
                     st.image(hack_img, caption="4. Hacker Attack", use_container_width=True)
                     st.pyplot(plot_histogram(hack_img, "Wrong Key (+0.00001)"))
                 
-                st.success("✅ Analysis Complete: The system shows 0% data loss on correct key and perfect Avalanche Effect against unauthorized keys.")
+                st.success(" Analysis Complete: The system shows 0% data loss on correct key and perfect Avalanche Effect against unauthorized keys.")
