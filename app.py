@@ -66,6 +66,7 @@ def plot_histogram(image_rgb, title):
     plt.tight_layout()
     return fig
 
+
 # --- 2. WEB APP UI SETTINGS ---
 st.set_page_config(page_title="A chaotic approach for image encryption", page_icon="🔐", layout="wide")
 
@@ -125,12 +126,15 @@ with tab_encrypt:
                     if is_success:
                         st.download_button(" Download Encrypted Image", buffer.tobytes(), "encrypted.png", "image/png")
 
+
 # ==========================================
 #               DECRYPTION TAB
 # ==========================================
 with tab_decrypt:
     st.header("Step 2: Restore Your Image")
     dec_file = st.file_uploader("Upload Encrypted Image", type=["png"], key="dec_up")
+    
+    # Original Size maangne wala option (BACKUP)
     col_w, col_h = st.columns(2)
     with col_w: input_w = st.number_input("Original Width", min_value=1, value=640)
     with col_h: input_h = st.number_input("Original Height", min_value=1, value=480)
@@ -143,13 +147,14 @@ with tab_decrypt:
         col3, col4 = st.columns(2)
         with col3: st.image(encrypted_image, caption="Encrypted Input", use_container_width=True)
             
-        if st.button(" Decrypt Now", key="btn_dec"):
+        if st.button("🔓 Decrypt Now", key="btn_dec"):
             with st.spinner('Matching Secret Keys...'):
                 r_enc, g_enc, b_enc = cv2.split(encrypted_image)
                 r_final = inverse_arnold_cat_map(diffusion_xor(r_enc, logistic_x0, logistic_r), arnold_iterations)
                 g_final = inverse_arnold_cat_map(diffusion_xor(g_enc, logistic_x0, logistic_r), arnold_iterations)
                 b_final = inverse_arnold_cat_map(diffusion_xor(b_enc, logistic_x0, logistic_r), arnold_iterations)
                 
+                # Image ko exactly Original Size par crop karne wala logic (BACKUP)
                 final_restored_img = cv2.merge((r_final, g_final, b_final))[0:input_h, 0:input_w]
                 
                 with col4:
@@ -157,7 +162,6 @@ with tab_decrypt:
                     is_success, buffer = cv2.imencode(".jpg", cv2.cvtColor(final_restored_img, cv2.COLOR_RGB2BGR))
                     if is_success:
                         st.download_button(" Download Restored", buffer.tobytes(), "restored.jpg", "image/jpeg")
-
 # ==========================================
 #           SECURITY DASHBOARD TAB
 # ==========================================
@@ -214,5 +218,4 @@ with tab_analysis:
                     st.image(hack_img, caption="4. Hacker Attack", use_container_width=True)
                     st.pyplot(plot_histogram(hack_img, "Wrong Key (+0.00001)"))
                 
-
                 st.success(" Analysis Complete: The system shows 0% data loss on correct key and perfect Avalanche Effect against unauthorized keys.")
