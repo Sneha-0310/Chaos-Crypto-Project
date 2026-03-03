@@ -67,9 +67,9 @@ def plot_histogram(image_rgb, title):
     return fig
 
 # --- 2. WEB APP UI SETTINGS ---
-st.set_page_config(page_title="Chaos Crypto Pro", page_icon="🔐", layout="wide")
+st.set_page_config(page_title="A chaotic approach for image encryption", page_icon="🔐", layout="wide")
 
-st.title(" Chaos-Based Image Cryptography")
+st.title(" A chaotic approach for image encryption")
 st.markdown("Secure your private images using non-linear dynamical systems.")
 st.markdown("---")
 
@@ -214,4 +214,5 @@ with tab_analysis:
                     st.image(hack_img, caption="4. Hacker Attack", use_container_width=True)
                     st.pyplot(plot_histogram(hack_img, "Wrong Key (+0.00001)"))
                 
+
                 st.success(" Analysis Complete: The system shows 0% data loss on correct key and perfect Avalanche Effect against unauthorized keys.")
