@@ -82,11 +82,12 @@ logistic_x0 = st.sidebar.number_input("Secret Key 1 (x0)", value=0.54321, format
 logistic_r = st.sidebar.number_input("Secret Key 2 (r)", value=3.99, format="%.2f")
 
 # --- 4. TABS SETUP ---
-tab_encrypt, tab_decrypt, tab_analysis = st.tabs([" Encrypt Image", " Decrypt Image", "📊 Security Dashboard"])
+tab_encrypt, tab_decrypt, tab_analysis = st.tabs([" Encrypt Image", " Decrypt Image", " Security Dashboard"])
 
 # ==========================================
 #               ENCRYPTION TAB
 # ==========================================
+
 with tab_encrypt:
     st.header("Step 1: Hide Your Image")
     input_method = st.radio("Choose Input:", (" Upload from PC", " Take Live Photo"))
@@ -102,6 +103,10 @@ with tab_encrypt:
         opencv_image = cv2.imdecode(file_bytes, 1)
         original_image = cv2.cvtColor(opencv_image, cv2.COLOR_BGR2RGB)
         orig_h, orig_w = original_image.shape[:2]
+        
+         
+        st.session_state['saved_w'] = orig_w
+        st.session_state['saved_h'] = orig_h
         
         col1, col2 = st.columns(2)
         with col1:
@@ -125,19 +130,18 @@ with tab_encrypt:
                     is_success, buffer = cv2.imencode(".png", cv2.cvtColor(final_encrypted_img, cv2.COLOR_RGB2BGR))
                     if is_success:
                         st.download_button(" Download Encrypted Image", buffer.tobytes(), "encrypted.png", "image/png")
-
-
 # ==========================================
 #               DECRYPTION TAB
 # ==========================================
+
 with tab_decrypt:
     st.header("Step 2: Restore Your Image")
     dec_file = st.file_uploader("Upload Encrypted Image", type=["png"], key="dec_up")
     
-    # Original Size maangne wala option (BACKUP)
-    col_w, col_h = st.columns(2)
-    with col_w: input_w = st.number_input("Original Width", min_value=1, value=640)
-    with col_h: input_h = st.number_input("Original Height", min_value=1, value=480)
+    
+    
+    input_w = st.session_state.get('saved_w', 640)
+    input_h = st.session_state.get('saved_h', 480)
         
     if dec_file is not None:
         file_bytes = np.asarray(bytearray(dec_file.read()), dtype=np.uint8)
@@ -147,14 +151,14 @@ with tab_decrypt:
         col3, col4 = st.columns(2)
         with col3: st.image(encrypted_image, caption="Encrypted Input", use_container_width=True)
             
-        if st.button("🔓 Decrypt Now", key="btn_dec"):
+        if st.button(" Decrypt Now", key="btn_dec"):
             with st.spinner('Matching Secret Keys...'):
                 r_enc, g_enc, b_enc = cv2.split(encrypted_image)
                 r_final = inverse_arnold_cat_map(diffusion_xor(r_enc, logistic_x0, logistic_r), arnold_iterations)
                 g_final = inverse_arnold_cat_map(diffusion_xor(g_enc, logistic_x0, logistic_r), arnold_iterations)
                 b_final = inverse_arnold_cat_map(diffusion_xor(b_enc, logistic_x0, logistic_r), arnold_iterations)
                 
-                # Image ko exactly Original Size par crop karne wala logic (BACKUP)
+                
                 final_restored_img = cv2.merge((r_final, g_final, b_final))[0:input_h, 0:input_w]
                 
                 with col4:
